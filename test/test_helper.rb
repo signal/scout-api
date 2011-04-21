@@ -1,6 +1,6 @@
-require 'scout_scout'
-require 'spec'
-require 'spec/autorun'
+$LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+require File.expand_path(File.dirname(__FILE__) + '../../lib/scout_scout')
+require 'test/unit'
 require 'fakeweb'
 
 FakeWeb.allow_net_connect = false

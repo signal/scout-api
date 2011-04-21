@@ -5,7 +5,6 @@ require 'nokogiri'
 require 'cgi'
 require 'scout_scout/version'
 require 'scout_scout/server'
-require 'scout_scout/descriptor'
 require 'scout_scout/plugin'
 require 'scout_scout/trigger'
 require 'scout_scout/alert'
@@ -22,8 +21,8 @@ class ScoutScout
   class Error < RuntimeError
   end
 
-  def initialize(scout_account_name, username, password)
-    self.class.account = scout_account_name
+  def initialize(account_param, username, password)
+    self.class.account = account_param
     self.class.basic_auth username, password
   end
 

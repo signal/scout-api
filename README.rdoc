@@ -27,14 +27,14 @@ A library for interacting with Scout[http//:scoutapp.com], a hosted monitoring s
   #details about triggers for a specific plugin
   plugin_triggers = ram_hungry.plugin(12345).triggers
 
-  #all available descriptors
-  descriptors = ScoutScout::Descriptor.all
+  #all available metrics
+  descriptors = ScoutScout::Metric.all
   
-  # all descriptors on servers that match the provided host
-  descriptors = ScoutScout::Descriptor.all(:host => 'awesome.com')
+  # all metrics on servers that match the provided host
+  metrics = ScoutScout::Metric.all(:host => 'awesome.com')
 
-  #cluster metrics
-  ScoutScout::Cluster.average('mem_used')
+  # average memory used across all servers
+  ScoutScout::Metric.average('mem_used')
   
   #create a server using the server with id=6 as the template.
   ScoutScout::Server.create('heavy metal',:id => 6) => <#ScoutScout::Server>
@@ -45,7 +45,7 @@ A library for interacting with Scout[http//:scoutapp.com], a hosted monitoring s
 == Metrics
 
 The library allows you to extract aggregate metrics across all and/or
-selected servers in your account. See <tt>Cluster#average</tt> for
+selected servers in your account. See <tt>Metric#average</tt> for
 information and examples.
 
 == Note on Patches/Pull Requests
@@ -61,4 +61,4 @@ information and examples.
 
 == Copyright
 
-Copyright (c) 2010 Jesse Newland, Derek Haynes. See LICENSE for details.
+Copyright (c) 2011 Jesse Newland, Derek Haynes. See LICENSE for details.

@@ -9,11 +9,11 @@ class ScoutScout::Plugin < Hashie::Mash
     super(hash)
   end
 
-  # All descriptors for this plugin, including their name and current
+  # All metric for this plugin, including their name and last reported value
   #
-  # @return [Array] An array of ScoutScout::Descriptor objects
-  def descriptors
-    @descriptors ||= @descriptor_hash.map { |d| decorate_with_server_and_plugin(ScoutScout::Descriptor.new(d)) }
+  # @return [Array] An array of ScoutScout::Metric objects
+  def metrics
+    @metrics ||= @descriptor_hash.map { |d| decorate_with_server_and_plugin(ScoutScout::Metric.new(d)) }
   end
 
   def email_subscribers

@@ -95,11 +95,11 @@ class ScoutScout::Server < Hashie::Mash
     decorate_with_server(ScoutScout::Plugin.new(response['plugin']))
   end
 
-  # All descriptors for this server
+  # All metrics for this server
   #
-  # @return [Array] An array of ScoutScout::Descriptor objects
-  def descriptors
-    ScoutScout::Descriptor.all(:host => hostname).map { |d| decorate_with_server(d) }
+  # @return [Array] An array of ScoutScout::Metric objects
+  def metrics
+    ScoutScout::Metric.all(:host => hostname).map { |d| decorate_with_server(d) }
   end
 
   # Details about all triggers for this server

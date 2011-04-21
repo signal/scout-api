@@ -18,20 +18,6 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::GemcutterTasks.new
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
-task :default => :spec
-
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   version = ScoutScout::VERSION
@@ -46,3 +32,12 @@ desc "Open an irb session preloaded with this library"
 task :console do
   sh "irb -rubygems -I lib -r scout_scout.rb"
 end
+
+require "rake/testtask"
+Rake::TestTask.new do |test|
+  test.libs << "test"
+  test.test_files = [ "test/*.rb" ]
+  test.verbose = true
+end
+
+task :default => :test
