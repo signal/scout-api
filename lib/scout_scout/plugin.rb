@@ -1,21 +1,29 @@
 class ScoutScout::Plugin < Hashie::Mash
   attr_accessor :server
-  attr_reader :metrics, :descriptor_hash
+  
+  # Retrieve metric information. See ScoutScout::Metric#average for a list of options for the calculation
+  # methods (average, minimum, maximum).
+  # 
+  # Examples:
+  # 
+  # * <tt>ScoutScout::Plugin.metrics => All metrics associated with this plugin.</tt>
+  # * <tt>ScoutScout::Plugin.metrics.all(:name => 'mem_used') => Metrics with name =~ 'mem_used' on this plugin.</tt>
+  # * <tt>ScoutScout::Plugin.metrics.average(:name => 'mem_used') => Average value of metrics with name =~ 'mem_used' on this plugin.</tt> 
+  # * <tt>ScoutScout::Plugin.metrics.maximum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Plugin.metrics.minimum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Plugin.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
+  # * <tt>ScoutScout::Plugin.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
+  attr_reader :metrics
+  
+  attr_reader :descriptor_hash #:nodoc:
 
-  def initialize(hash)
+  def initialize(hash) #:nodoc:
     if hash['descriptors'] && hash['descriptors']['descriptor']
       @descriptor_hash = hash['descriptors']['descriptor']
       hash.delete('descriptors')
     end
-    @metrics = MetricProxy.new(self)
+    @metrics = ScoutScout::MetricProxy.new(self)
     super(hash)
-  end
-
-  # All metric for this plugin, including their name and last reported value
-  #
-  # @return [Array] An array of ScoutScout::Metric objects
-  def metrics_old
-    @metrics_old ||= @descriptor_hash.map { |d| decorate_with_server_and_plugin(ScoutScout::Metric.new(d)) }
   end
 
   def email_subscribers
@@ -42,7 +50,7 @@ class ScoutScout::Plugin < Hashie::Mash
 
 protected
 
-  def decorate_with_server_and_plugin(hashie)
+  def decorate_with_server_and_plugin(hashie) #:nodoc:
     hashie.server = self.server
     hashie.plugin = self
     hashie

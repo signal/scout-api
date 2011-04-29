@@ -1,17 +1,31 @@
+# Groups represent a collection of servers. 
+# They can be created in the Scout UI to put similar servers together (ex: Web Servers, Database Servers).
 class ScoutScout::Group < Hashie::Mash
+  # Retrieve metric information. See ScoutScout::Metric#average for a list of options for the calculation
+  # methods (average, minimum, maximum).
+  # 
+  # Examples:
+  # 
+  # * <tt>ScoutScout::Group.metrics => All metrics associated with this group.</tt>
+  # * <tt>ScoutScout::Group.metrics.all(:name => 'mem_used') => Metrics with name =~ 'mem_used' across all servers in this group.</tt>
+  # * <tt>ScoutScout::Group.metrics.average(:name => 'mem_used') => Average value of metrics with name =~ 'mem_used' across all servers in the group.</tt> 
+  # * <tt>ScoutScout::Group.metrics.maximum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Group.metrics.minimum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Group.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
+  # * <tt>ScoutScout::Group.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
   attr_reader :metrics
 
-  def initialize(hash)
-    @metrics = MetricProxy.new(self)
+  def initialize(hash) #:nodoc:
+    @metrics = ScoutScout::MetricProxy.new(self)
     super(hash)
   end
   
-  # Finds a single group that meets the given conditions. Possible parameter formats:
+  # Finds the first group that meets the given conditions. Possible parameter formats:
   # 
-  # ScoutScout::Group.first(1) => Finds the group with ID=1
-  # ScoutScout::Group.first(:name => 'db slaves') => Finds the first group where name=~'db slaves'
+  # * <tt>ScoutScout::Group.first(1)</tt>
+  # * <tt>ScoutScout::Group.first(:name => 'db slaves')</tt>
   #
-  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
+  # For the <tt>:name</tt>, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   #
   # @return [ScoutScout::Group]
   def self.first(id_or_options)
@@ -33,10 +47,10 @@ class ScoutScout::Group < Hashie::Mash
   
   # Finds all groups that meets the given conditions. Possible parameter formats:
   # 
-  # ScoutScout::Group.all => Returns all groups
-  # ScoutScout::Group.all(:name => 'web') => Finds groups where name=~'web'
+  # * <tt>ScoutScout::Group.all</tt>
+  # * <tt>ScoutScout::Group.all(:name => 'web')</tt>
   #
-  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
+  # For the <tt>:name</tt>, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   #
   # @return [Array] An array of ScoutScout::Group objects
   def self.all(options = {})

@@ -1,56 +1,64 @@
 = scout_scout
 
-A library for interacting with Scout[http//:scoutapp.com], a hosted monitoring service.
+An ActiveRecord-like[http://api.rubyonrails.org/classes/ActiveRecord/Base.html] library for 
+interacting with Scout[http://scoutapp.com], a hosted server monitoring service. Query for metric data, manage servers, and more.
+
+== Getting Started 
+
+Install the gem if you haven't already:
+
+  gem install scout_scout
+
+Require the gem and authenticate to get your Scout on:
 
   require 'scout_scout'
   scout = ScoutScout.new('youraccountname', 'your@awesome.com', 'sekret')
 
-  #all your servers
-  servers = ScoutScout::Server.all
+== Basics
 
-  #server w/ ID=1
+You can query for the following high-level objects:
+
+* ScoutScout::Server
+* ScoutScout::Group
+* ScoutScout::Metric
+
+Each of the classes have similar, Rails-like finder methods. For example:
+
+  # All Servers
+  ScoutScout::Server.all
+
+  # First server with ID=1
   server = ScoutScout::Server.first(1)
 
-  #all servers that match the given hostname.
-  # see mysql regex formatting: http://dev.mysql.com/doc/refman/5.0/en/regexp.html
-  app_servers = ScoutScout::Server.all(:host => 'db[0-9]*.awesome.com')
+  # All Groups with name =~ 'Web'
+  ScoutScout::Group.all(:name => 'Web')
 
-  #details on that server's plugins
-  plugins = server.plugins
+== Metrics
 
-  #details about a specific plugin w/ ID=12345
-  data = server.plugin(12345)
+Access your metric data stored in Scout. You can retrieve data for a specific metric,
+a group of metrics, and aggregated metrics. For example:
 
-  #details on that server's triggers
-  triggers = server.triggers
+  # average value of the metric with ID=1 over the past hour
+  ScoutScout::Metric.average(1)
 
-  #details about triggers for a specific plugin
-  plugin_triggers = server.plugin(12345).triggers
-
-  #all available metrics
-  descriptors = ScoutScout::Metric.all
-  
-  # all metrics on a server
-  metrics = server.metrics
-
-  # all metrics on a server w/the name 'mem_used'
-  metrics = server.metrics.all('mem_used')
+  # maximum rate of insert queries over the previous 24 hours
+  ScoutScout::Server.first(:name => "DB Server").metrics.maximum('inserts',:start => Time.now.utc-(24*3600)*2,:end => Time.now.utc-(24*3600))
 
   # average memory used across all servers in the 'web servers' group
   ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used')
 
   # total throughput across web servers
   ScoutScout::Group.first(:name => 'web servers').metrics.average('request_rate', :aggregate => true)
+
+== Server Management
+
+Create and delete servers:
   
-  #create a server using the server with id=6 as the template.
+  # create a server using the server with id=6 as the template.
   ScoutScout::Server.create('heavy metal',:id => 6) => <#ScoutScout::Server>
   
-  #delete the server with id=10
-  ScoutScout::Server.delete(10) => true
-
-== Metric Details
-
-For more details on querying metrics stored in Scout, see <tt>Metric#average</tt>.
+  # delete the server with id=10
+  ScoutScout::Server.delete(10)
 
 == Note on Patches/Pull Requests
 

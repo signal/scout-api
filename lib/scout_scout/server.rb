@@ -1,23 +1,36 @@
 class ScoutScout::Server < Hashie::Mash
+  # Retrieve metric information. See ScoutScout::Metric#average for a list of options for the calculation
+  # methods (average, minimum, maximum).
+  # 
+  # Examples:
+  # 
+  # * <tt>ScoutScout::Server.metrics => All metrics associated with this server.</tt>
+  # * <tt>ScoutScout::Server.metrics.all(:name => 'mem_used') => Metrics with name =~ 'mem_used' on this server.</tt>
+  # * <tt>ScoutScout::Server.metrics.average(:name => 'mem_used') => Average value of metrics with name =~ 'mem_used' on this server.</tt> 
+  # * <tt>ScoutScout::Server.metrics.maximum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Server.metrics.minimum(:name => 'mem_used')</tt>
+  # * <tt>ScoutScout::Server.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
+  # * <tt>ScoutScout::Server.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
   attr_reader :metrics
   
-  def initialize(hash)
+  def initialize(hash) #:nodoc:
     if hash['active_alerts']
       @alert_hash = hash['active_alerts']
       hash.delete('active_alerts')
     end
-    @metrics = MetricProxy.new(self)
+    @metrics = ScoutScout::MetricProxy.new(self)
     super(hash)
   end
 
-  # Finds a single server that meets the given conditions. Possible parameter formats:
+  # Finds the first server that meets the given conditions. Possible parameter formats:
   # 
-  # ScoutScout::Server.first(1) => Finds the server with ID=1
-  # ScoutScout::Server.first(:name => 'web server') => Finds the first server where name=~'web server'
-  # ScoutScout::Server.first(:host => 'web*.geocities') => Finds the first server where hostname=~'web*.geocities'
+  # * <tt>ScoutScout::Server.first(1)</tt>
+  # * <tt>ScoutScout::Server.first(:name => 'db slaves')</tt>
+  # * <tt>ScoutScout::Server.first(:host => 'web*.geocities')</tt>
   #
-  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
   #
+  # For the <tt>:name</tt> and <tt>:host</tt> options, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
+  # 
   # @return [ScoutScout::Server]
   def self.first(id_or_options)
     if id_or_options.is_a?(Hash)
@@ -47,12 +60,11 @@ class ScoutScout::Server < Hashie::Mash
   
   # Finds all servers that meets the given conditions. Possible parameter formats:
   # 
-  # ScoutScout::Server.all => Returns all servers
-  # ScoutScout::Server.all(:name => 'web server') => Finds servers where name=~'web server'
-  # ScoutScout::Server.all(:host => 'web*.geocities') => Finds servers where hostname=~'web*.geocities'
+  # * <tt>ScoutScout::Server.all(:name => 'db slaves')</tt>
+  # * <tt>ScoutScout::Server.all(:host => 'web*.geocities')</tt>
   #
-  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
-  #
+  # For the <tt>:name</tt> and <tt>:host</tt> options, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
+  # 
   # @return [Array] An array of ScoutScout::Server objects
   def self.all(options = {})
     if name=options[:name]
@@ -67,10 +79,10 @@ class ScoutScout::Server < Hashie::Mash
     response['clients'] ? response['clients'].map { |client| ScoutScout::Server.new(client) } : Array.new
   end
   
-  # Creates a new server. If an error occurs, a +ScoutScout::Error+ is raised.
+  # Creates a new server. If an error occurs, a [ScoutScout::Error] is raised.
   #
   # An optional existing server id can be used as a template:
-  # ScoutScout::Server.create('web server 12',:id => 99999)
+  # <tt>ScoutScout::Server.create('web server 12',:id => 99999)</tt>
   #
   # @return [ScoutScout::Server]
   def self.create(name,options = {})
@@ -83,7 +95,7 @@ class ScoutScout::Server < Hashie::Mash
     first(response.headers['id'].first.to_i)
   end
   
-  # Delete a server by id. If an error occurs, a +ScoutScout::Error+ is raised.
+  # Delete a server by <tt>id</tt>. If an error occurs, a [ScoutScout::Error] is raised.
   #
   # @return [true]
   def self.delete(id)
@@ -129,13 +141,6 @@ class ScoutScout::Server < Hashie::Mash
     decorate_with_server(ScoutScout::Plugin.new(response['plugin']))
   end
 
-  # All metrics for this server
-  #
-  # @return [Array] An array of ScoutScout::Metric objects
-  def metrics_old
-    ScoutScout::Metric.all(:host => hostname).map { |d| decorate_with_server(d) }
-  end
-
   # Details about all triggers for this server
   #
   # @return [Array] An array of ScoutScout::Trigger objects
@@ -146,7 +151,7 @@ class ScoutScout::Server < Hashie::Mash
 
 protected
 
-  def decorate_with_server(hashie)
+  def decorate_with_server(hashie) #:nodoc:
     hashie.server = self
     hashie
   end

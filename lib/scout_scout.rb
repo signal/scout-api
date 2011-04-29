@@ -16,7 +16,6 @@ require 'scout_scout/metric_proxy'
 class ScoutScout
   include HTTParty
   base_uri 'https://scoutapp.com'
-  #base_uri 'http://localhost:3000'
   
   format :xml
   mattr_inheritable :account

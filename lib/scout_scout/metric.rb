@@ -3,10 +3,10 @@ class ScoutScout::Metric < Hashie::Mash
   
   # Finds a single metric that meets the given conditions. Possible parameter formats:
   # 
-  # ScoutScout::Metric.first(1) => Finds the metric with ID=1
-  # ScoutScout::Metric.first(:name => 'request_rate') => Finds the first metric where name=~'request_rate'
+  # * <tt>ScoutScout::Metric.first(1)</tt> => Finds the metric with ID=1
+  # * <tt>ScoutScout::Metric.first(:name => 'request_rate')</tt> => Finds the first metric where name=~'request_rate'
   #
-  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
+  # For the <tt>:name</tt>, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   #
   # @return [ScoutScout::Metric]
   def self.first(id_or_options)
@@ -35,33 +35,44 @@ class ScoutScout::Metric < Hashie::Mash
     response['ar_descriptors'] ? response['ar_descriptors'].map { |descriptor| ScoutScout::Metric.new(descriptor) } : Array.new
   end
   
-  # Find the average value of a metric by ID or name (ex: 'disk_used'). If the metric couldn't be found AND/OR
-  # hasn't reported since +options[:start]+, a ScoutScout::Error is raised.
+  # Find the average value of a metric by ID or name (ex: <tt>'disk_used'</tt>). If the metric couldn't be found AND/OR
+  # hasn't reported since <tt>options[:start]</tt>, a [ScoutScout::Error] is raised.
   #
   # A 3-element Hash is returned with the following keys:
-  # * value
-  # * units
-  # * label
+  # * <tt>:value</tt>
+  # * <tt>:units</tt>
+  # * <tt>:label</tt>
   #
-  # Options:
+  # <b>Options:</b>
   #
-  # * <tt>:start</tt>: The start time for grabbing metrics. Default is 1 hour ago. Times will be converted to UTC.
-  # * <tt>:end</tt>: The end time for grabbing metrics. Default is NOW. Times will be converted to UTC.
-  # * <tt>:aggregate</tt>: Whether the metrics should be added together or an average across each metric should be returned.
-  #   Default is false. Note that total is not necessary equal to the value on each server * num of servers. :aggregate makes sense
-  #   for metrics like throughput across a group of web servers where each server records its own throughput, but you are interested in
-  #   the total throughput for the app.
+  # * <tt>:start</tt> - The start time for grabbing metrics. Default is 1 hour ago. Times will be converted to UTC.
+  # * <tt>:end</tt> - The end time for grabbing metrics. Default is <tt>Time.now.utc</tt>. Times will be converted to UTC.
+  # * <tt>:aggregate</tt> - Whether the metrics should be added together or an average across each metric should be returned.
+  #   Default is false. Note that total is not necessary equal to the value on each server * num of servers. 
   #
-  # Examples:
+  # <b>When to use <tt>:aggregate</tt>?</b>
   #
-  # What is the average request time across my servers?
-  # ScoutScout::Metric.average('request_time')
+  # If you have a number of web servers, you may be interested in the total throughput for your application, not just the average 
+  # on each server. For example:
   #
-  # What is the average TOTAL throughput across my servers?
-  # ScoutScout::Metric.average('request_rate', :aggregate => true)
+  # * Web Server No. 1 Average Throughput => 100 req/sec
+  # * Web Server No. 2 Average Throughput => 150 req/sec
   #
-  # How much average memory did my servers use yesterday?
-  # ScoutScout::Metric.average('mem_used', :start => Time.now-(24*60*60)*2, :end => Time.now-(24*60*60))
+  # <tt>:aggregate => true</tt> will return ~ 250 req/sec, giving the total throughput for your entire app. 
+  # The default, <tt>:aggregate => false</tt>, will return ~ 125 req/sec, giving the average throughput across the web servers.
+  #
+  # <tt>:aggregate => true</tt> likely doesn't make sense for any metric that is on a 0-100 scale (like CPU Usage, Disk Capacity, etc.). 
+  #
+  # <b>Examples:</b>
+  #
+  #   # What is the average request time across my servers?
+  #   ScoutScout::Metric.average('request_time') => {:value => 0.20, :units => 'sec', :label => 'Request Time'}
+  #
+  #   # What is the average TOTAL throughput across my servers?
+  #   ScoutScout::Metric.average('request_rate', :aggregate => true)
+  #
+  #   # How much average memory did my servers use yesterday?
+  #   # ScoutScout::Metric.average('mem_used', :start => Time.now-(24*60*60)*2, :end => Time.now-(24*60*60))
   #
   # @return [Hash]
   def self.average(id_or_name,options = {})
@@ -86,18 +97,24 @@ class ScoutScout::Metric < Hashie::Mash
     calculate('MIN',id_or_name,options)
   end
   
+  # See ScoutScout::Metric#average for a list of options.
+  #
   # @return [Hash]
   def average(opts = {})
     self.class.average(identifier, options_for_relationship(opts))
   end
   alias avg average
 
+  # See ScoutScout::Metric#average for a list of options.
+  #
   # @return [Hash]
   def maximum(opts = {})
      self.class.maximum(identifier, options_for_relationship(opts))
   end
   alias max maximum
 
+  # See ScoutScout::Metric#average for a list of options.
+  #
   # @return [Hash]
   def minimum(opts = {})
      self.class.minimum(identifier, options_for_relationship(opts))
@@ -108,12 +125,12 @@ class ScoutScout::Metric < Hashie::Mash
   
   # Metrics are identified by either their given ID or their name. If ID is present,
   # use it.
-  def identifier
+  def identifier #:nodoc:
     [:id] ? [:id] : name
   end
   
   # The friendlier-named average, minimum, and maximum methods call this method.
-  def self.calculate(function,id_or_name,options = {})
+  def self.calculate(function,id_or_name,options = {}) #:nodoc:
     start_time,end_time=format_times(options)
     consolidate = options[:aggregate] ? 'SUM' : 'AVG'
     
@@ -135,7 +152,7 @@ class ScoutScout::Metric < Hashie::Mash
   end
 
   # Used to apply finder conditions
-  def options_for_relationship(opts = {})
+  def options_for_relationship(opts = {}) #:nodoc:
     relationship_options = {}
     if id?
       relationship_options[:ids] = id
