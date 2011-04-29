@@ -1,24 +1,70 @@
 class ScoutScout::Server < Hashie::Mash
+  attr_reader :metrics
+  
   def initialize(hash)
     if hash['active_alerts']
       @alert_hash = hash['active_alerts']
       hash.delete('active_alerts')
     end
+    @metrics = MetricProxy.new(self)
     super(hash)
   end
 
-  # Search for a server by id or matching hostname
+  # Finds a single server that meets the given conditions. Possible parameter formats:
+  # 
+  # ScoutScout::Server.first(1) => Finds the server with ID=1
+  # ScoutScout::Server.first(:name => 'web server') => Finds the first server where name=~'web server'
+  # ScoutScout::Server.first(:host => 'web*.geocities') => Finds the first server where hostname=~'web*.geocities'
+  #
+  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
   #
   # @return [ScoutScout::Server]
-  def self.first(server_id_or_hostname)
-    if server_id_or_hostname.is_a?(Fixnum)
-      response = ScoutScout.get("/#{ScoutScout.account}/clients/#{server_id_or_hostname}.xml")
+  def self.first(id_or_options)
+    if id_or_options.is_a?(Hash)
+      if name=id_or_options[:name]
+        response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?name=#{name}")
+        raise ScoutScout::Error, 'Not Found' if response['clients'].nil?
+        ScoutScout::Server.new(response['clients'].first)
+      elsif host=id_or_options[:host]
+        response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?host=#{host}")
+        raise ScoutScout::Error, 'Not Found' if response['clients'].nil?
+        ScoutScout::Server.new(response['clients'].first)
+      else
+        raise ScoutScout::Error, "Invalid finder condition"
+      end
+    elsif id_or_options.is_a?(Fixnum)
+      response = ScoutScout.get("/#{ScoutScout.account}/clients/#{id_or_options}.xml")
       ScoutScout::Server.new(response['client'])
-    else
-      response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?host=#{server_id_or_hostname}")
+    elsif id_or_options.is_a?(String)
+      warn "Server#first(hostname) will be deprecated. Use Server#first(:host => hostname)"
+      response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?host=#{id_or_options}")
       raise ScoutScout::Error, 'Not Found' if response['clients'].nil?
       ScoutScout::Server.new(response['clients'].first)
+    else
+      raise ScoutScout::Error, "Invalid finder condition"
     end
+  end
+  
+  # Finds all servers that meets the given conditions. Possible parameter formats:
+  # 
+  # ScoutScout::Server.all => Returns all servers
+  # ScoutScout::Server.all(:name => 'web server') => Finds servers where name=~'web server'
+  # ScoutScout::Server.all(:host => 'web*.geocities') => Finds servers where hostname=~'web*.geocities'
+  #
+  # Use a MySQL-formatted Regex. http://dev.mysql.com/doc/refman/5.0/en/regexp.html
+  #
+  # @return [Array] An array of ScoutScout::Server objects
+  def self.all(options = {})
+    if name=options[:name]
+      response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?name=#{name}")
+    elsif host=options[:host]
+      response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?host=#{host}")
+    elsif options.empty?
+      response = ScoutScout.get("/#{ScoutScout.account}/clients.xml")
+    else
+      raise ScoutScout::Error, "Invalid finder condition"
+    end
+    response['clients'] ? response['clients'].map { |client| ScoutScout::Server.new(client) } : Array.new
   end
   
   # Creates a new server. If an error occurs, a +ScoutScout::Error+ is raised.
@@ -50,18 +96,6 @@ class ScoutScout::Server < Hashie::Mash
     else
       return true
     end
-  end
-
-  # Search for servers by matching hostname via :host.
-  #
-  # Example: ScoutScout::Server.all(:host => 'soawesome.org')
-  #
-  # @return [Array] An array of ScoutScout::Server objects
-  def self.all(options)
-    hostname = options[:host]
-    raise ScoutScout::Error, "Please specify a host via :host" if hostname.nil?
-    response = ScoutScout.get("/#{ScoutScout.account}/clients.xml?host=#{hostname}")
-    response['clients'] ? response['clients'].map { |client| ScoutScout::Server.new(client) } : Array.new
   end
 
   # Active alerts for this server
@@ -98,7 +132,7 @@ class ScoutScout::Server < Hashie::Mash
   # All metrics for this server
   #
   # @return [Array] An array of ScoutScout::Metric objects
-  def metrics
+  def metrics_old
     ScoutScout::Metric.all(:host => hostname).map { |d| decorate_with_server(d) }
   end
 

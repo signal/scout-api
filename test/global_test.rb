@@ -14,15 +14,6 @@ class GlobalTest < Test::Unit::TestCase
     assert @scout_scout.class.default_options[:basic_auth] == { :username => 'username', :password => 'password' }
   end
   
-  def test_servers
-    @scout_scout.stub_get('clients.xml')
-    servers = @scout_scout.servers
-    assert_equal 2, servers.size
-    assert servers.first.is_a?(ScoutScout::Server)
-    assert servers.last.active_alerts.first.is_a?(ScoutScout::Alert)
-    assert servers.last.active_alerts.first.title =~ /Passenger/ 
-  end
-  
   def test_alerts
     @scout_scout.stub_get('activities.xml')
     activities = @scout_scout.alerts

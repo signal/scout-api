@@ -1,19 +1,21 @@
 class ScoutScout::Plugin < Hashie::Mash
   attr_accessor :server
+  attr_reader :metrics, :descriptor_hash
 
   def initialize(hash)
     if hash['descriptors'] && hash['descriptors']['descriptor']
       @descriptor_hash = hash['descriptors']['descriptor']
       hash.delete('descriptors')
     end
+    @metrics = MetricProxy.new(self)
     super(hash)
   end
 
   # All metric for this plugin, including their name and last reported value
   #
   # @return [Array] An array of ScoutScout::Metric objects
-  def metrics
-    @metrics ||= @descriptor_hash.map { |d| decorate_with_server_and_plugin(ScoutScout::Metric.new(d)) }
+  def metrics_old
+    @metrics_old ||= @descriptor_hash.map { |d| decorate_with_server_and_plugin(ScoutScout::Metric.new(d)) }
   end
 
   def email_subscribers

@@ -8,13 +8,16 @@ require 'scout_scout/server'
 require 'scout_scout/plugin'
 require 'scout_scout/trigger'
 require 'scout_scout/alert'
-require 'scout_scout/cluster.rb'
+require 'scout_scout/group.rb'
 require 'scout_scout/metric.rb'
 require 'scout_scout/person'
+require 'scout_scout/metric_proxy'
 
 class ScoutScout
   include HTTParty
   base_uri 'https://scoutapp.com'
+  #base_uri 'http://localhost:3000'
+  
   format :xml
   mattr_inheritable :account
   
@@ -38,6 +41,7 @@ class ScoutScout
   #
   # @return [Array] An array of ScoutScout::Server objects
   def servers
+    warn "ScoutScout#servers is deprecated. Use ScoutScout::Server.all() instead."
     response = self.class.get("/#{self.class.account}/clients.xml")
     response['clients'].map { |client| ScoutScout::Server.new(client) }
   end

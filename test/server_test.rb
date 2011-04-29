@@ -15,9 +15,18 @@ class ServerTest < Test::Unit::TestCase
   
   def test_first_by_hostname
     @scout_scout.stub_get('clients.xml?host=foo.awesome.com', 'client_by_hostname.xml')
-    server = ScoutScout::Server.first('foo.awesome.com')
+    server = ScoutScout::Server.first(:host => 'foo.awesome.com')
     assert server.is_a?(ScoutScout::Server)
     assert_equal 'FOOBAR', server.key
+  end
+  
+  def test_find_all
+    @scout_scout.stub_get('clients.xml')
+    servers = ScoutScout::Server.all
+    assert_equal 2, servers.size
+    assert servers.first.is_a?(ScoutScout::Server)
+    assert servers.last.active_alerts.first.is_a?(ScoutScout::Alert)
+    assert servers.last.active_alerts.first.title =~ /Passenger/
   end
   
   def test_plugin
@@ -70,15 +79,6 @@ class ServerTest < Test::Unit::TestCase
       assert_equal 'peak', trigger.simple_type
     end
     assert triggers.first.is_a?(ScoutScout::Trigger)
-  end
-  
-  def test_metrics
-    @scout_scout.stub_get('clients/13431.xml', 'client.xml')
-    server = ScoutScout::Server.first(13431)
-    @scout_scout.stub_get('descriptors.xml?descriptor=&host=foobar.com&', 'descriptors.xml')
-    metrics = server.metrics
-    assert_equal 30, metrics.size
-    assert metrics.first.is_a?(ScoutScout::Metric)
   end
   
   def test_create

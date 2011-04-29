@@ -6,35 +6,41 @@ A library for interacting with Scout[http//:scoutapp.com], a hosted monitoring s
   scout = ScoutScout.new('youraccountname', 'your@awesome.com', 'sekret')
 
   #all your servers
-  servers = scout.servers
+  servers = ScoutScout::Server.all
 
-  #one specific server - pass in hostname
-  ram_hungry = ScoutScout::Server.first('db1.awesome.com')
+  #server w/ ID=1
+  server = ScoutScout::Server.first(1)
 
-  #all servers that match the hostname.
+  #all servers that match the given hostname.
   # see mysql regex formatting: http://dev.mysql.com/doc/refman/5.0/en/regexp.html
   app_servers = ScoutScout::Server.all(:host => 'db[0-9]*.awesome.com')
 
   #details on that server's plugins
-  ram_hungry_plugins = ram_hungry.plugins
+  plugins = server.plugins
 
-  #details about a specific plugin
-  data = ram_hungry.plugin(12345)
+  #details about a specific plugin w/ ID=12345
+  data = server.plugin(12345)
 
-  #detauls on that server's triggers
-  ram_hungry_triggers = ram_hungry.triggers
+  #details on that server's triggers
+  triggers = server.triggers
 
   #details about triggers for a specific plugin
-  plugin_triggers = ram_hungry.plugin(12345).triggers
+  plugin_triggers = server.plugin(12345).triggers
 
   #all available metrics
   descriptors = ScoutScout::Metric.all
   
-  # all metrics on servers that match the provided host
-  metrics = ScoutScout::Metric.all(:host => 'awesome.com')
+  # all metrics on a server
+  metrics = server.metrics
 
-  # average memory used across all servers
-  ScoutScout::Metric.average('mem_used')
+  # all metrics on a server w/the name 'mem_used'
+  metrics = server.metrics.all('mem_used')
+
+  # average memory used across all servers in the 'web servers' group
+  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used')
+
+  # total throughput across web servers
+  ScoutScout::Group.first(:name => 'web servers').metrics.average('request_rate', :aggregate => true)
   
   #create a server using the server with id=6 as the template.
   ScoutScout::Server.create('heavy metal',:id => 6) => <#ScoutScout::Server>
@@ -42,11 +48,9 @@ A library for interacting with Scout[http//:scoutapp.com], a hosted monitoring s
   #delete the server with id=10
   ScoutScout::Server.delete(10) => true
 
-== Metrics
+== Metric Details
 
-The library allows you to extract aggregate metrics across all and/or
-selected servers in your account. See <tt>Metric#average</tt> for
-information and examples.
+For more details on querying metrics stored in Scout, see <tt>Metric#average</tt>.
 
 == Note on Patches/Pull Requests
 
