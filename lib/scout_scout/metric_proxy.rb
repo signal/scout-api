@@ -1,4 +1,5 @@
-# This class works similar to Ruby on Rails' AssociationProxy, providing a nice interface to metrics.
+# This class works similar to Ruby on Rails' AssociationProxy, providing a nice interface to metrics
+# from owner objects in Scout (ex: Server, Group, Plugin).
 # See http://stackoverflow.com/questions/1529606/how-do-rails-association-methods-work for background
 # 
 # Example usage:

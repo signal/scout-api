@@ -26,7 +26,7 @@ class ScoutScout::Metric < Hashie::Mash
     end
   end
 
-  # Search for metrics. Typicial interaction is through the MetricProxy (ex: server.metrics.all)
+  # Search for metrics. MetricProxy uses this method to search for metrics. Refer to MetricProxy#all.
   #
   # @return [Array] An array of ScoutScout::Metric objects
   def self.all(options = {})
@@ -35,7 +35,7 @@ class ScoutScout::Metric < Hashie::Mash
     response['ar_descriptors'] ? response['ar_descriptors'].map { |descriptor| ScoutScout::Metric.new(descriptor) } : Array.new
   end
   
-  # Find the average value of a metric by name (ex: 'disk_used'). If the metric couldn't be found AND/OR
+  # Find the average value of a metric by ID or name (ex: 'disk_used'). If the metric couldn't be found AND/OR
   # hasn't reported since +options[:start]+, a ScoutScout::Error is raised.
   #
   # A 3-element Hash is returned with the following keys:
@@ -68,7 +68,7 @@ class ScoutScout::Metric < Hashie::Mash
     calculate('AVG',id_or_name,options)
   end
   
-  # Find the maximum value of a metric by name (ex: 'last_minute').
+  # Find the maximum value of a metric by ID or name (ex: 'last_minute').
   #
   # See +average+ for options and examples.
   #
@@ -77,7 +77,7 @@ class ScoutScout::Metric < Hashie::Mash
     calculate('MAX',id_or_name,options)
   end
 
-  # Find the minimum value of a metric by name (ex: 'last_minute').
+  # Find the minimum value of a metric by ID or name (ex: 'last_minute').
   #
   # See +average+ for options and examples.
   #
@@ -106,11 +106,13 @@ class ScoutScout::Metric < Hashie::Mash
 
   protected
   
-  # Metrics are identified by either their given ID or their name.
+  # Metrics are identified by either their given ID or their name. If ID is present,
+  # use it.
   def identifier
     [:id] ? [:id] : name
   end
   
+  # The friendlier-named average, minimum, and maximum methods call this method.
   def self.calculate(function,id_or_name,options = {})
     start_time,end_time=format_times(options)
     consolidate = options[:aggregate] ? 'SUM' : 'AVG'
@@ -132,6 +134,7 @@ class ScoutScout::Metric < Hashie::Mash
     end
   end
 
+  # Used to apply finder conditions
   def options_for_relationship(opts = {})
     relationship_options = {}
     if id?
