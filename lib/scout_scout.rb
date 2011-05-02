@@ -12,10 +12,13 @@ require 'scout_scout/group.rb'
 require 'scout_scout/metric.rb'
 require 'scout_scout/person'
 require 'scout_scout/metric_proxy'
+require 'scout_scout/metric_calculation'
+
 
 class ScoutScout
   include HTTParty
   base_uri 'https://scoutapp.com'
+  base_uri 'http://localhost:3000'
   
   format :xml
   mattr_inheritable :account

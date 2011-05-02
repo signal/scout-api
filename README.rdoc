@@ -1,7 +1,7 @@
 = scout_scout
 
-An ActiveRecord-like[http://api.rubyonrails.org/classes/ActiveRecord/Base.html] library for 
-interacting with Scout[http://scoutapp.com], a hosted server monitoring service. Query for metric data, manage servers, and more.
+A library for interacting with Scout[http://scoutapp.com], a hosted server monitoring service. 
+Query for metric data, manage servers, and more.
 
 == Getting Started 
 
@@ -24,13 +24,13 @@ You can query for the following high-level objects:
 
 Each of the classes have similar, Rails-like finder methods. For example:
 
-  # All Servers
+  # all servers
   ScoutScout::Server.all
 
-  # First server with ID=1
+  # first server with ID=1
   server = ScoutScout::Server.first(1)
 
-  # All Groups with name =~ 'Web'
+  # all groups with name =~ 'Web'
   ScoutScout::Group.all(:name => 'Web')
 
 == Metrics
@@ -46,6 +46,10 @@ a group of metrics, and aggregated metrics. For example:
 
   # average memory used across all servers in the 'web servers' group
   ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used')
+  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used').to_sparkline
+  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used').to_a
+
+
 
   # total throughput across web servers
   ScoutScout::Group.first(:name => 'web servers').metrics.average('request_rate', :aggregate => true)

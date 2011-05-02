@@ -97,6 +97,50 @@ class ScoutScout::Metric < Hashie::Mash
     calculate('MIN',id_or_name,options)
   end
   
+  def self.to_array(function,id_or_name,options = {})
+    start_time,end_time=format_times(options)
+    consolidate = options[:aggregate] ? 'SUM' : 'AVG'
+    
+    if id_or_name.is_a?(Fixnum)
+      name = nil
+      ids = id_or_name
+    else
+      name = id_or_name
+      ids = nil
+    end
+    
+    response = ScoutScout.get("/#{ScoutScout.account}/descriptors/series.xml?name=#{CGI.escape(name.to_s)}&ids=#{ids}&function=#{function}&consolidate=#{consolidate}&plugin_ids=#{options[:plugin_ids]}&server_ids=#{options[:server_ids]}&group_ids=#{options[:group_ids]}&start=#{start_time}&end=#{end_time}")
+
+    if response['records']
+      response['records']
+      #puts response['records'].first.inspect
+      response['records'].values.flatten.map { |r| [Time.parse(r['time']),r['value'].to_f] }
+    else
+      raise ScoutScout::Error, response['error']
+    end
+  end
+  
+  def self.to_sparkline(function,id_or_name,options = {})
+    start_time,end_time=format_times(options)
+    consolidate = options[:aggregate] ? 'SUM' : 'AVG'
+    
+    if id_or_name.is_a?(Fixnum)
+      name = nil
+      ids = id_or_name
+    else
+      name = id_or_name
+      ids = nil
+    end
+    
+    response = ScoutScout.get("/#{ScoutScout.account}/descriptors/sparkline?name=#{CGI.escape(name.to_s)}&ids=#{ids}&function=#{function}&consolidate=#{consolidate}&plugin_ids=#{options[:plugin_ids]}&server_ids=#{options[:server_ids]}&group_ids=#{options[:group_ids]}&start=#{start_time}&end=#{end_time}")
+
+    if response['error']
+      raise ScoutScout::Error, response['error']
+    else
+      response.body
+    end
+  end
+  
   # See ScoutScout::Metric#average for a list of options.
   #
   # @return [Hash]

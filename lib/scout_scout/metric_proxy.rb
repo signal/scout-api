@@ -7,10 +7,19 @@
 # server.metrics.average('idle') => average value of all metrics w/name 'idle' associated with the server
 class ScoutScout::MetricProxy
   instance_methods.each { |m| undef_method m unless m =~ /(^__|^nil\?$|^send$|proxy_|^object_id$)/ }
+  attr_reader :owner
+  attr_reader :avg_calc
   
   def initialize(owner) #:nodoc:
     @owner = owner
+    @avg_calc = ScoutScout::MetricCalculation.new(self,:AVG)
     @loaded = false
+  end
+  
+  def avg_calc(*args)
+    puts "avg calc"
+    @avg_calc.args = args
+    @avg_calc
   end
   
   # Find all metrics w/name <tt>metric_name</tt> associated with the proxy owner (Group, Server, or Plugin).
