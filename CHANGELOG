@@ -2,7 +2,7 @@
 
 Initial release.
 
-== 1.0.0
+== 0.9.1
 
 * Fixed Ruby 1.9.2 issue accessing Server#key
 * Documentation updates
