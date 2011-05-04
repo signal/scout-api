@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{scout_api}
-  s.version = "0.9.0"
+  s.version = "0.9.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jesse Newland", "Derek Haynes"]
@@ -37,7 +37,6 @@ Gem::Specification.new do |s|
     "lib/scout_api/trigger.rb",
     "lib/scout_api/version.rb",
     "scout_api.gemspec",
-    "scout_scout.gemspec",
     "test/alert_test.rb",
     "test/fixtures/activities.xml",
     "test/fixtures/client.xml",
