@@ -1,0 +1,8 @@
+== 0.9.0
+
+Initial release.
+
+== 1.0.0
+
+* Fixed Ruby 1.9.2 issue accessing Server#key
+* Documentation updates

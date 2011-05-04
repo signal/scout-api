@@ -1,16 +1,16 @@
-class ScoutScout::Alert < Hashie::Mash
+class Scout::Alert < Hashie::Mash
   attr_writer :server
 
   # The Scout server that generated this alert
   #
-  # @return [ScoutScout::Server]
+  # @return [Scout::Server]
   def server
-    @server ||= ScoutScout::Server.first(client_id)
+    @server ||= Scout::Server.first(client_id)
   end
 
   # The Scout plugin that generated this alert
   #
-  # @return [ScoutScout::Plugin]
+  # @return [Scout::Plugin]
   def plugin
     server.plugin(plugin_id)
   end

@@ -1,8 +1,8 @@
-class ScoutScout::Trigger < Hashie::Mash
+class Scout::Trigger < Hashie::Mash
   attr_writer :server, :plugin
   
   def server
-    @server ||= ScoutScout::Server.first(id)
+    @server ||= Scout::Server.first(id)
   end
 
   def plugin

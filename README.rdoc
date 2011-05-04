@@ -1,4 +1,4 @@
-= scout_scout
+= scout_api
 
 A library for interacting with Scout[http://scoutapp.com], a hosted server monitoring service. 
 Query for metric data, manage servers, and more.
@@ -7,31 +7,34 @@ Query for metric data, manage servers, and more.
 
 Install the gem if you haven't already:
 
-  gem install scout_scout
+  gem install scout_api
 
 Require the gem and authenticate to get your Scout on:
 
-  require 'scout_scout'
-  scout = ScoutScout.new('youraccountname', 'your@awesome.com', 'sekret')
+  require 'scout_api'
+  scout = Scout::Account.new('youraccountname', 'your@awesome.com', 'sekret')
 
 == Basics
 
 You can query for the following high-level objects:
 
-* ScoutScout::Server
-* ScoutScout::Group
-* ScoutScout::Metric
+* Scout::Server
+* Scout::Group
+* Scout::Metric
 
-Each of the classes have similar, Rails-like finder methods. For example:
+Each of the classes have Rails-like finder methods. For example:
 
   # all servers
-  ScoutScout::Server.all
+  Scout::Server.all
 
-  # first server with ID=1
-  server = ScoutScout::Server.first(1)
+  # first server
+  Scout::Server.first
+
+  # first metric with ID=1
+  Scout::Metric.first(1)
 
   # all groups with name =~ 'Web'
-  ScoutScout::Group.all(:name => 'Web')
+  Scout::Group.all(:name => 'Web')
 
 == Metrics
 
@@ -39,34 +42,33 @@ Access your metric data stored in Scout. You can retrieve data for a specific me
 a group of metrics, and aggregated metrics. For example:
 
   # average value of the metric with ID=1 over the past hour
-  ScoutScout::Metric.average(1)
+  Scout::Metric.average(1)
 
   # maximum rate of insert queries over the previous 24 hours
-  ScoutScout::Server.first(:name => "DB Server").metrics.maximum('inserts',:start => Time.now.utc-(24*3600)*2,:end => Time.now.utc-(24*3600))
+  Scout::Server.first(:name => "DB Server").metrics.maximum(:name => 'inserts', 
+  :start => Time.now.utc-(24*3600)*2,:end => Time.now.utc-(24*3600) )
 
   # average memory used across all servers in the 'web servers' group
-  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used')
-  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used').to_sparkline
-  ScoutScout::Group.first(:name => 'web servers').metrics.average('mem_used').to_a
-
-
+  Scout::Group.first(:name => 'web servers').metrics.average(:name => 'Memory Used')
+  Scout::Group.first(:name => 'web servers').metrics.average(:name => 'Memory Used').to_sparkline
+  Scout::Group.first(:name => 'web servers').metrics.average(:name => 'Memory Used').to_a
 
   # total throughput across web servers
-  ScoutScout::Group.first(:name => 'web servers').metrics.average('request_rate', :aggregate => true)
+  Scout::Group.first(:name => 'web servers').metrics.average(:name => 'request_rate', :aggregate => true)
 
 == Server Management
 
 Create and delete servers:
   
   # create a server using the server with id=6 as the template.
-  ScoutScout::Server.create('heavy metal',:id => 6) => <#ScoutScout::Server>
+  Scout::Server.create('heavy metal',:id => 6) => <#Scout::Server>
   
   # delete the server with id=10
-  ScoutScout::Server.delete(10)
+  Scout::Server.delete(10)
 
 == Note on Patches/Pull Requests
 
-* Fork the project.
+* Fork the project[https://github.com/highgroove/scout-api].
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.

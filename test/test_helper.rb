@@ -1,16 +1,17 @@
 $LOAD_PATH << File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-require File.expand_path(File.dirname(__FILE__) + '../../lib/scout_scout')
+require File.expand_path(File.dirname(__FILE__) + '../../lib/scout_api')
 require 'test/unit'
 require 'fakeweb'
 
 FakeWeb.allow_net_connect = false
 
-class ScoutScout
+class Scout::Account
 
   def scout_url(path)
-    uri = URI.join(self.class.default_options[:base_uri], "#{self.class.account}/", path)
+    uri = URI.join(self.class.default_options[:base_uri], "#{self.class.param}/", path)
     uri.userinfo = "#{self.class.default_options[:basic_auth][:username]}:#{self.class.default_options[:basic_auth][:password]}".gsub(/@/, '%40')
-    uri.to_s
+    url = uri.to_s
+    url << (url.include?('?') ? '&' : '?') + "api_version=#{Scout::VERSION}"
   end
 
   def file_fixture(filename)
