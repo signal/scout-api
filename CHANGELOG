@@ -6,3 +6,7 @@ Initial release.
 
 * Fixed Ruby 1.9.2 issue accessing Server#key
 * Documentation updates
+
+== 1.0.0
+
+* Updates for YARD documentation formatting

@@ -66,6 +66,10 @@ Create and delete servers:
   # delete the server with id=10
   Scout::Server.delete(10)
 
+== Ruby Compatibility
+
+scout_api has been tested against Ruby 1.8.6, Ruby 1.8.7, and Ruby 1.9.2.
+
 == Note on Patches/Pull Requests
 
 * Fork the project[https://github.com/highgroove/scout-api].
