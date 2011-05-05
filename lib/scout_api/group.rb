@@ -1,20 +1,37 @@
 # Groups represent a collection of servers. 
 # They can be created in the Scout UI to put similar servers together (ex: Web Servers, Database Servers).
 class Scout::Group < Hashie::Mash
-  # Retrieve metric information. See Scout::Metric#average for a list of options for the calculation
+  # Retrieve metric information. See {Scout::Metric.average} for a list of options for the calculation
   # methods (average, minimum, maximum).
   # 
   # Examples:
   # 
-  # * <tt>Scout::Group.metrics => All metrics associated with this group.</tt>
-  # * <tt>Scout::Group.metrics.all(:name => 'Memory Used') => Metrics with name =~ 'Memory Used' across all servers in this group.</tt>
-  # * <tt>Scout::Group.metrics.average(:name => 'Memory Used') => Average value of metrics with name =~ 'Memory Used' across all servers in the group.</tt> 
-  # * <tt>Scout::Group.metrics.maximum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Group.metrics.minimum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Group.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
-  # * <tt>Scout::Group.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
-  # * <tt>Scout::Group.metrics.average(:name => 'Memory Used').to_array => An array of time series values over the past hour.</tt> 
-  # * <tt>Scout::Group.metrics.average(:name => 'Memory Used').to_sparkline => A Url to a Google Sparkline Chart.</tt> 
+  #  # All metrics associated with this group.
+  #  Scout::Group.metrics
+  # 
+  #  # Metrics with name =~ 'Memory Used' across all servers in this group.
+  #  Scout::Group.metrics.all(:name => 'Memory Used')
+  # 
+  #  # Average value of metrics with name =~ 'Memory Used' across all servers in the group
+  #  Scout::Group.metrics.average(:name => 'Memory Used')
+  # 
+  #  # Maximum value ...
+  #  Scout::Group.metrics.maximum(:name => 'Memory Used')
+  # 
+  #  # Minimum value ... 
+  #  Scout::Group.metrics.minimum(:name => 'Memory Used')
+  #
+  #  # Sum metrics, then take average
+  #  Scout::Group.metrics.average(:name => 'request_rate', :aggregate => true)
+  #
+  #  # Retrieve data starting @ 5 hours ago ending at 2 hours ago
+  #  Scout::Group.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600)
+  #
+  #  # An array of time series values over the past hour
+  #  Scout::Group.metrics.average(:name => 'Memory Used').to_array
+  #
+  #  # A Url to a Google Sparkline Chart
+  #  Scout::Group.metrics.average(:name => 'Memory Used').to_sparkline
   attr_reader :metrics
 
   def initialize(hash) #:nodoc:
@@ -24,9 +41,9 @@ class Scout::Group < Hashie::Mash
   
   # Finds the first group that meets the given conditions. Possible parameter formats:
   # 
-  # * <tt>Scout::Group.first</tt>
-  # * <tt>Scout::Group.first(1)</tt>
-  # * <tt>Scout::Group.first(:name => 'db slaves')</tt>
+  #  Scout::Group.first
+  #  Scout::Group.first(1)
+  #  Scout::Group.first(:name => 'db slaves')
   #
   # For the <tt>:name</tt>, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   #
@@ -53,8 +70,8 @@ class Scout::Group < Hashie::Mash
   
   # Finds all groups that meets the given conditions. Possible parameter formats:
   # 
-  # * <tt>Scout::Group.all</tt>
-  # * <tt>Scout::Group.all(:name => 'web')</tt>
+  #  Scout::Group.all
+  #  Scout::Group.all(:name => 'web')
   #
   # For the <tt>:name</tt>, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   #

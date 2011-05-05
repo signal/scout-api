@@ -40,16 +40,17 @@ class Scout::Metric < Hashie::Mash
     end
   end
 
-  # Search for metrics. MetricProxy uses this method to search for metrics. Refer to MetricProxy#all.
+  # Finds all metrics that match the conditons specified via <tt>options</tt>. {MetricProxy} uses this method to search for metrics. 
+  # Refer to {MetricProxy#all} for examples.
   #
-  # @return [Array] An array of Scout::Metric objects
+  # @return [Array] An array of {Scout::Metric} objects
   def self.all(options = {})
     raise Scout::Error, "A finder condition is required" if options.empty?
     response = Scout::Account.get("/descriptors.xml?name=#{CGI.escape(options[:name].to_s)}&ids=&plugin_ids=#{options[:plugin_ids]}&server_ids=#{options[:server_ids]}&group_ids=#{options[:group_ids]}")
     response['ar_descriptors'] ? response['ar_descriptors'].map { |descriptor| Scout::Metric.new(descriptor) } : Array.new
   end
   
-  # Find the average value of a metric by ID or name (ex: <tt>'disk_used'</tt>). If the metric couldn't be found AND/OR
+  # The average value of a metric by ID or name (ex: <tt>'disk_used'</tt>). If the metric couldn't be found AND/OR
   # hasn't reported since <tt>options[:start]</tt>, a [Scout::Error] is raised.
   #
   # A 3-element Hash is returned with the following keys:
@@ -93,18 +94,18 @@ class Scout::Metric < Hashie::Mash
     calculate('AVG',id_or_name,options)
   end
   
-  # Find the maximum value of a metric by ID or name (ex: 'last_minute').
+  # The maximum value of a metric by ID or name (ex: <tt>'last_minute'</tt>).
   #
-  # See +average+ for options and examples.
+  # Uses the same parameters as {average}. See {average} for options and examples.
   #
   # @return [Hash]
   def self.maximum(id_or_name,options = {})
     calculate('MAX',id_or_name,options)
   end
 
-  # Find the minimum value of a metric by ID or name (ex: 'last_minute').
+  # The minimum value of a metric by ID or name (<tt>ex: 'last_minute'</tt>).
   #
-  # See +average+ for options and examples.
+  # Uses the same parameters as {average}. See {average} for options and examples.
   #
   # @return [Hash]
   def self.minimum(id_or_name,options = {})
@@ -113,7 +114,7 @@ class Scout::Metric < Hashie::Mash
   
   # Returns time series data.
   #
-  # @return [Array]. This is a two-dimensional array, with the first element being the time in UTC and the second the value at that time.
+  # @return [Array] This is a two-dimensional array. The 1st element is the [Time] in UTC. The 2nd element is the value at that time as a [Float].
   def self.to_array(function,id_or_name,options = {})
     start_time,end_time=format_times(options)
     consolidate,name,ids=series_options(id_or_name,options)
@@ -132,9 +133,9 @@ class Scout::Metric < Hashie::Mash
   #
   # <b>Options:</b>
   #
-  # * <tt>:size</tt> - The size of the image in pixels. Default is 200x30.
-  # * <tt>:line_color</tt> - The color of the line. Default is 0077cc (blue).
-  # * <tt>:line_width</tt> - The width of the line in pixels. Default is 2.
+  # * <tt>:size</tt> - The size of the image in pixels. Default is <tt>'200x30'</tt>.
+  # * <tt>:line_color</tt> - The color of the line. Default is <tt>'0077cc'</tt> (blue).
+  # * <tt>:line_width</tt> - The width of the line in pixels. Default is <tt>2</t>.
   #
   # @return [String]
   def self.to_sparkline(function,id_or_name,options = {})
@@ -151,7 +152,7 @@ class Scout::Metric < Hashie::Mash
     end
   end
   
-  # See Scout::Metric#average for a list of options.
+  # The average value for this metric. See {Scout::Metric#average} for a list of options.
   #
   # @return [Hash]
   def average(opts = {})
@@ -160,7 +161,7 @@ class Scout::Metric < Hashie::Mash
   end
   alias avg average
 
-  # See Scout::Metric#average for a list of options.
+  # The maximum value for this metric. See {Scout::Metric#average} for a list of options.
   #
   # @return [Hash]
   def maximum(opts = {})
@@ -169,7 +170,7 @@ class Scout::Metric < Hashie::Mash
   end
   alias max maximum
 
-  # See Scout::Metric#average for a list of options.
+  # The minimum value for this metric. See {Scout::Metric#average} for a list of options.
   #
   # @return [Hash]
   def minimum(opts = {})
@@ -178,8 +179,7 @@ class Scout::Metric < Hashie::Mash
   end
   alias min minimum
   
-  # Metrics are identified by either their given ID or their name. If ID is present,
-  # use it.
+  # Metrics are identified by either their given ID or their name. Prefers ID.
   def identifier #:nodoc:
     id? ? id : name
   end

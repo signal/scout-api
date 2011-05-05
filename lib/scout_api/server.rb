@@ -1,18 +1,35 @@
 class Scout::Server < Hashie::Mash
-  # Retrieve metric information. See Scout::Metric#average for a list of options for the calculation
+  # Retrieve metric information. See {Scout::Metric.average} for a list of options for the calculation
   # methods (average, minimum, maximum).
   # 
   # Examples:
   # 
-  # * <tt>Scout::Server.metrics => All metrics associated with this server.</tt>
-  # * <tt>Scout::Server.metrics.all(:name => 'Memory Used') => Metrics with name =~ 'Memory Used' on this server.</tt>
-  # * <tt>Scout::Server.metrics.average(:name => 'Memory Used') => Average value of metrics with name =~ 'Memory Used' on this server.</tt> 
-  # * <tt>Scout::Server.metrics.maximum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Server.metrics.minimum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Server.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
-  # * <tt>Scout::Server.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
-  # * <tt>Scout::Server.metrics.average(:name => 'Memory Used').to_array => An array of time series values over the past hour.</tt> 
-  # * <tt>Scout::Server.metrics.average(:name => 'Memory Used').to_sparkline => A Url to a Google Sparkline Chart.</tt>
+  #  # All metrics associated with this server.
+  #  Scout::Server.metrics
+  #
+  #  # Metrics with name =~ 'Memory Used' on this server.
+  #  Scout::Server.metrics.all(:name => 'Memory Used')
+  #
+  #  # Average value of metrics with name =~ 'Memory Used' on this server.
+  #  Scout::Server.metrics.average(:name => 'Memory Used')
+  #
+  #  # Maximum value...
+  #  Scout::Server.metrics.maximum(:name => 'Memory Used')
+  #
+  #  # Minimum value...
+  #  Scout::Server.metrics.minimum(:name => 'Memory Used')
+  #
+  #  # Sum metrics, then take average
+  #  Scout::Server.metrics.average(:name => 'request_rate', :aggregate => true)
+  #
+  #  # Retrieve data starting @ 5 hours ago ending at 2 hours ago
+  #  Scout::Server.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600)
+  #
+  #  # An array of time series values over the past hour.
+  #  Scout::Server.metrics.average(:name => 'Memory Used').to_array
+  #
+  #  # A Url to a Google Sparkline Chart.
+  #  Scout::Server.metrics.average(:name => 'Memory Used').to_sparkline
   attr_reader :metrics
   
   def initialize(hash) #:nodoc:
@@ -24,17 +41,19 @@ class Scout::Server < Hashie::Mash
     super(hash)
   end
   
+  # Returns the key identifier for this server (ex: '<tt>6ecad322-0d17-4cb8-9b2c-a12c4541853f</tt>').
+  #
   # Ruby 1.9.2 Hash#key is a method. This overrides so +key+ returns Server#key.
   def key #:nodoc:
     self[:key]
   end
 
-  # Finds the first server that meets the given conditions. Possible parameter formats:
+  # Finds the first server that meets the given conditions.
   # 
-  # * <tt>Scout::Server.first</tt>
-  # * <tt>Scout::Server.first(1)</tt>
-  # * <tt>Scout::Server.first(:name => 'db slaves')</tt>
-  # * <tt>Scout::Server.first(:host => 'web*.geocities')</tt>
+  #  Scout::Server.first
+  #  Scout::Server.first(1)
+  #  Scout::Server.first(:name => 'db slaves')
+  #  Scout::Server.first(:host => 'web*.geocities')
   #
   #
   # For the <tt>:name</tt> and <tt>:host</tt> options, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
@@ -71,12 +90,12 @@ class Scout::Server < Hashie::Mash
   
   # Finds all servers that meets the given conditions. Possible parameter formats:
   # 
-  # * <tt>Scout::Server.all(:name => 'db slaves')</tt>
-  # * <tt>Scout::Server.all(:host => 'web*.geocities')</tt>
+  #  Scout::Server.all(:name => 'db slaves')
+  #  Scout::Server.all(:host => 'web*.geocities')
   #
   # For the <tt>:name</tt> and <tt>:host</tt> options, a {MySQL-formatted Regex}[http://dev.mysql.com/doc/refman/5.0/en/regexp.html] can be used.
   # 
-  # @return [Array] An array of Scout::Server objects
+  # @return [Array] An array of {Scout::Server} objects
   def self.all(options = {})
     if name=options[:name]
       response = Scout::Account.get("/clients.xml?name=#{CGI.escape(name)}")
@@ -90,10 +109,11 @@ class Scout::Server < Hashie::Mash
     response['clients'] ? response['clients'].map { |client| Scout::Server.new(client) } : Array.new
   end
   
-  # Creates a new server. If an error occurs, a [Scout::Error] is raised.
+  # Creates a new server with the given <tt>name</tt>. If an error occurs, a [Scout::Error] is raised.
   #
   # An optional existing server id can be used as a template:
-  # <tt>Scout::Server.create('web server 12',:id => 99999)</tt>
+  #
+  #  Scout::Server.create('web server 12',:id => 99999)
   #
   # @return [Scout::Server]
   def self.create(name,options = {})
@@ -107,6 +127,9 @@ class Scout::Server < Hashie::Mash
   end
   
   # Delete a server by <tt>id</tt>. If an error occurs, a [Scout::Error] is raised.
+  #
+  #  # Delete server w/id=1
+  #  ScoutScout::Server.delete(1)
   #
   # @return [true]
   def self.delete(id)
@@ -123,14 +146,14 @@ class Scout::Server < Hashie::Mash
 
   # Active alerts for this server
   #
-  # @return [Array] An array of Scout::Alert objects
+  # @return [Array] An array of {Scout::Alert} objects
   def active_alerts
     @active_alerts ||= @alert_hash.map { |a| decorate_with_server(Scout::Alert.new(a)) }
   end
 
   # Recent alerts for this server
   #
-  # @return [Array] An array of Scout::Alert objects
+  # @return [Array] An array of {Scout::Alert} objects
   def alerts
     response = Scout::Account.get("/clients/#{self.id}/activities.xml")
     response['alerts'].map { |alert| decorate_with_server(Scout::Alert.new(alert)) }
@@ -138,7 +161,7 @@ class Scout::Server < Hashie::Mash
 
   # Details about all plugins for this server
   #
-  # @return [Array] An array of Scout::Plugin objects
+  # @return [Array] An array of {Scout::Plugin }objects
   def plugins
     response = Scout::Account.get("/clients/#{self.id}/plugins.xml")
     response['plugins'].map { |plugin| decorate_with_server(Scout::Plugin.new(plugin)) }
@@ -154,7 +177,7 @@ class Scout::Server < Hashie::Mash
 
   # Details about all triggers for this server
   #
-  # @return [Array] An array of Scout::Trigger objects
+  # @return [Array] An array of {Scout::Trigger} objects
   def triggers
     response = Scout::Account.get("/clients/#{self.id}/triggers.xml")
     response['triggers'].map { |trigger| decorate_with_server(Scout::Trigger.new(trigger)) }

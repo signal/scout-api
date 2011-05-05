@@ -13,7 +13,7 @@ class Scout::Account
 
   # Recent alerts across all servers on this account
   #
-  # @return [Array] An array of Scout::Alert objects
+  # @return [Array] An array of {Scout::Alert} objects
   def alerts
     response = self.class.get("/activities.xml")
     response['alerts'] ? response['alerts'].map { |alert| Scout::Alert.new(alert) } : Array.new
@@ -48,10 +48,13 @@ class Scout::Account
     alias_method :http_get, :get
   end
   
+  # Wraps GET requests with error handling, attaches to the authenticated account, and 
+  # adds the library version as a parameter.
+  #
   # Checks for errors via the HTTP status code. If an error is found, a 
   # Scout::Error is raised. Otherwise, the response.
   # 
-  # @return HTTParty::Response
+  # @return [HTTParty::Response]
   def self.get(uri)
     raise Scout::Error, 
           "Authentication is required (scout = Scout::Account.new('youraccountname', 'your@awesome.com', 'sekret'))" if param.nil?

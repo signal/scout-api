@@ -3,8 +3,11 @@
 # See http://stackoverflow.com/questions/1529606/how-do-rails-association-methods-work for background
 # 
 # Example usage:
-# group.metrics => all metrics associated with the group
-# server.metrics.average('idle') => average value of all metrics w/name 'idle' associated with the server
+#
+#  # all metrics associated with the group
+#  group.metrics
+#  # average value of all metrics w/name 'idle' associated with the server
+#  server.metrics.average(:name => 'idle')
 class Scout::MetricProxy
   instance_methods.each { |m| undef_method m unless m =~ /(^__|^nil\?$|^send$|proxy_|^object_id$|is\_a\?)/ }
   attr_reader :owner
@@ -16,9 +19,10 @@ class Scout::MetricProxy
     @max_calc = Scout::MetricCalculation.new(self,:MAX)
   end
   
-  # Calculate the average value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner (Group, Server, or Plugin).
+  # Calculate the average value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner 
+  # ({Scout::Group}, {Scout::Server}, or {Scout::Plugin}).
   #
-  # See Metric#average for options.
+  # See {Metric#average} for options.
   #
   # @return [Hash]
   def average(options)
@@ -28,7 +32,7 @@ class Scout::MetricProxy
   end
   alias avg average
   
-  # Calculate the minimum value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner (Group, Server, or Plugin).
+  # Calculate the minimum value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner ({Scout::Group}, {Scout::Server}, or {Scout::Plugin}).
   #
   # See Metric#average for options.
   #
@@ -40,7 +44,7 @@ class Scout::MetricProxy
   end
   alias min minimum
   
-  # Calculate the maximum value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner (Group, Server, or Plugin).
+  # Calculate the maximum value of the metric w/<tt>:name => metric_name</tt> associated with the proxy owner ({Scout::Group}, {Scout::Server}, or {Scout::Plugin}).
   #
   # See Metric#average for options.
   #
@@ -52,7 +56,7 @@ class Scout::MetricProxy
   end
   alias max maximum
   
-  # Find all metrics w/ <tt>:name => metric_name</tt> associated with the proxy owner (Group, Server, or Plugin).
+  # Find all metrics w/ <tt>:name => metric_name</tt> associated with the proxy owner ({Scout::Group}, {Scout::Server}, or {Scout::Plugin}).
   #
   # Example:
   #

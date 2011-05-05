@@ -18,9 +18,9 @@ Require the gem and authenticate to get your Scout on:
 
 You can query for the following high-level objects:
 
-* Scout::Server
-* Scout::Group
-* Scout::Metric
+* {Scout::Server}
+* {Scout::Group}
+* {Scout::Metric}
 
 Each of the classes have Rails-like finder methods. For example:
 

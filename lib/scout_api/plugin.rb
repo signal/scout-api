@@ -1,20 +1,37 @@
 class Scout::Plugin < Hashie::Mash
   attr_accessor :server
   
-  # Retrieve metric information. See Scout::Metric#average for a list of options for the calculation
+  # Retrieve metric information. See {Scout::Metric.average} for a list of options for the calculation
   # methods (average, minimum, maximum).
   # 
   # Examples:
   # 
-  # * <tt>Scout::Plugin.metrics => All metrics associated with this plugin.</tt>
-  # * <tt>Scout::Plugin.metrics.all(:name => 'Memory Used') => Metrics with name =~ 'Memory Used' on this plugin.</tt>
-  # * <tt>Scout::Plugin.metrics.average(:name => 'Memory Used') => Average value of metrics with name =~ 'Memory Used' on this plugin.</tt> 
-  # * <tt>Scout::Plugin.metrics.maximum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Plugin.metrics.minimum(:name => 'Memory Used')</tt>
-  # * <tt>Scout::Plugin.metrics.average(:name => 'request_rate', :aggregate => true) => Sum metrics, then take average</tt>
-  # * <tt>Scout::Plugin.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600) => Retrieve data starting @ 5 hours ago ending at 2 hours ago</tt>
-  # * <tt>Scout::Plugin.metrics.average(:name => 'Memory Used').to_array => An array of time series values over the past hour.</tt> 
-  # * <tt>Scout::Plugin.metrics.average(:name => 'Memory Used').to_sparkline => A Url to a Google Sparkline Chart.</tt>
+  #  # All metrics associated with this plugin.
+  #  Scout::Plugin.metrics
+  #
+  #  # Metrics with name =~ 'Memory Used' on this plugin.
+  #  Scout::Plugin.metrics.all(:name => 'Memory Used')
+  #
+  #  # Average value of metrics with name =~ 'Memory Used' on this plugin.
+  #  Scout::Plugin.metrics.average(:name => 'Memory Used')
+  #
+  #  # Maximum value...
+  #  Scout::Plugin.metrics.maximum(:name => 'Memory Used')
+  #
+  #  # Minumum value...
+  #  Scout::Plugin.metrics.minimum(:name => 'Memory Used')
+  #
+  #  # Sum metrics, then take average
+  #  Scout::Plugin.metrics.average(:name => 'request_rate', :aggregate => true)
+  #
+  #  # Retrieve data starting @ 5 hours ago ending at 2 hours ago
+  #  Scout::Plugin.metrics.average(:name => 'request_rate', :start => Time.now.utc-5*3600, :end => Time.now.utc-2*3600)
+  #
+  #  # An array of time series values over the past hour
+  #  Scout::Plugin.metrics.average(:name => 'Memory Used').to_array
+  #
+  #  # A Url to a Google Sparkline Chart.
+  #  Scout::Plugin.metrics.average(:name => 'Memory Used').to_sparkline
   attr_reader :metrics
   
   attr_reader :descriptor_hash #:nodoc:
