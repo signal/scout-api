@@ -141,8 +141,6 @@ class Scout::Metric < Hashie::Mash
   def self.to_sparkline(function,id_or_name,options = {})
     start_time,end_time=format_times(options)
     consolidate,name,ids=series_options(id_or_name,options)
-    puts options.inspect
-    puts start_time.inspect
     response = Scout::Account.get("/descriptors/sparkline?name=#{CGI.escape(name.to_s)}&ids=#{ids}&function=#{function}&consolidate=#{consolidate}&plugin_ids=#{options[:plugin_ids]}&server_ids=#{options[:server_ids]}&group_ids=#{options[:group_ids]}&start=#{start_time}&end=#{end_time}&size=#{options[:size]}&line_color=#{options[:line_color]}&line_width=#{options[:line_width]}")
 
     if response['error']
