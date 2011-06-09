@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jesse Newland", "Derek Haynes"]
-  s.date = %q{2011-05-04}
+  s.date = %q{2011-06-09}
   s.description = %q{A library for interacting with Scout (http://scoutapp.com), a hosted server monitoring service. Query for metric data, manage servers, and more.}
   s.email = %q{support@scoutapp.com}
   s.extra_rdoc_files = [
@@ -72,21 +72,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<hashie>, ["~> 0.1.8"])
-      s.add_runtime_dependency(%q<httparty>, ["~> 0.5.0"])
+      s.add_runtime_dependency(%q<hashie>, ["~> 1.0.0"])
+      s.add_runtime_dependency(%q<httparty>, ["~> 0.7.0"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 0"])
       s.add_development_dependency(%q<fakeweb>, [">= 0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.0"])
     else
-      s.add_dependency(%q<hashie>, ["~> 0.1.8"])
-      s.add_dependency(%q<httparty>, ["~> 0.5.0"])
+      s.add_dependency(%q<hashie>, ["~> 1.0.0"])
+      s.add_dependency(%q<httparty>, ["~> 0.7.0"])
       s.add_dependency(%q<nokogiri>, [">= 0"])
       s.add_dependency(%q<fakeweb>, [">= 0"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.0"])
     end
   else
-    s.add_dependency(%q<hashie>, ["~> 0.1.8"])
-    s.add_dependency(%q<httparty>, ["~> 0.5.0"])
+    s.add_dependency(%q<hashie>, ["~> 1.0.0"])
+    s.add_dependency(%q<httparty>, ["~> 0.7.0"])
     s.add_dependency(%q<nokogiri>, [">= 0"])
     s.add_dependency(%q<fakeweb>, [">= 0"])
     s.add_dependency(%q<jeweler>, ["~> 1.5.0"])
